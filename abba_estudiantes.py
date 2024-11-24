@@ -94,15 +94,13 @@ def generar_G_r(n: int, alfabeto: list[str]) -> GrafoDirigido | None:
                               `n` es 0 o si el alfabeto está vacío, ya que no
                               pueden generarse cadenas en estos casos.
     """
-    # Completar
-    ...
+    pass
 
 
 def distancia_a_palindromo(grafo: GrafoDirigido, start: str) -> int:
     """utiliza un algoritmo BFS para encontrar la minima distancia desde start
     a un palindromo en el grafo de reemplazos"""
-    # Completar
-    ...
+    pass
 
 
 # Ejemplo basico de uso
