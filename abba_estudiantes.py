@@ -10,7 +10,9 @@ class Vertice:
     def get_nombre(self) -> str:
         return self.nombre
 
-    def reemplaza(self, old: str, new: str) -> "Vertice":
+    def reemplaza(self, old: str, new: str) -> "Vertice | None":
+        if old not in self.nombre:
+            return None
         return Vertice(self.nombre.replace(old, new))
 
     def __str__(self) -> str:
@@ -18,6 +20,15 @@ class Vertice:
 
     def __repr__(self) -> str:
         return f"{self.nombre}"
+
+    def __eq__(self, other):
+        if isinstance(other, Vertice):
+            return self.nombre == other.nombre
+
+        return False
+
+    def __hash__(self):
+        return hash(self.nombre)
 
 
 class GrafoDirigido:
@@ -39,7 +50,7 @@ class GrafoDirigido:
 
         self.vecinos[origen].add(destino)
 
-    def get_adjacent(self, vertice: "Vertice") -> Any:
+    def get_adjacent(self, vertice: "Vertice") -> Set[Vertice]:
         return self.vecinos[vertice]
 
     def get_nodes(self) -> list["Vertice"]:
@@ -97,54 +108,80 @@ def generar_G_r(n: int, alfabeto: list[str]) -> GrafoDirigido | None:
                               `n` es 0 o si el alfabeto está vacío, ya que no
                               pueden generarse cadenas en estos casos.
     """
-    pass
+    if n <= 0 or len(alfabeto) == 0:
+        return None
+
+    grafo = GrafoDirigido()
+
+    # Hago el producto de todos los elementos del alfabeto para generar todos los posibles vertices
+    producto = product(alfabeto, repeat=n)
+    vertices = ["".join(combinacion) for combinacion in producto]
+
+    for vertice in vertices:
+        v = Vertice(vertice)
+        grafo.agregar_vertice(v)
+
+    for vertice in grafo.get_nodes():
+        for old in alfabeto:
+            for new in alfabeto:
+                reemplazo = vertice.reemplaza(old, new)
+                if old != new and reemplazo and reemplazo in grafo.get_nodes():
+                    grafo.agregar_arista(vertice, reemplazo)
+
+    return grafo
 
 
 def distancia_a_palindromo(grafo: GrafoDirigido, start: str) -> int:
     """utiliza un algoritmo BFS para encontrar la minima distancia desde start
     a un palindromo en el grafo de reemplazos"""
-    visitados = []
-    cola = deque([start])
-    distancia = 0
+    vertice_start = Vertice(start)
 
-    if es_palindromo(start):
-        return distancia
+    if es_palindromo(vertice_start.get_nombre()):
+        return 0
+
+    visitados = []
+    cola = deque([(vertice_start, 0)])  # Vertice actual y la distancia
 
     while len(cola) != 0:
-        vertice = cola.remove()
+        vertice, distancia = cola.popleft()
+
+        if es_palindromo(vertice.get_nombre()):
+            return distancia
 
         if vertice not in visitados:
             visitados.append(vertice)
 
             for vecino in grafo.get_adjacent(vertice):
                 if vecino not in visitados:
-                    cola.append(vecino)
+                    cola.append((vecino, distancia + 1))
 
-                if es_palindromo(vecino):
-                    distancia += 1
-
-    return distancia
+    # No se encontró ningun palíndromo
+    return -1
 
 
 # Ejemplo basico de uso
-grafo_basico = GrafoDirigido()
-v1 = Vertice(1)
-v2 = Vertice(2)
-v3 = Vertice(3)
+# grafo_basico = GrafoDirigido()
+# v1 = Vertice(1)
+# v2 = Vertice(2)
+# v3 = Vertice(3)
 
-grafo_basico.agregar_vertice(v1)
-grafo_basico.agregar_vertice(v2)
-grafo_basico.agregar_vertice(v3)
+# grafo_basico.agregar_vertice(v1)
+# grafo_basico.agregar_vertice(v2)
+# grafo_basico.agregar_vertice(v3)
 
-grafo_basico.agregar_arista(v1, v2)
-grafo_basico.agregar_arista(v1, v3)
+# grafo_basico.agregar_arista(v1, v2)
+# grafo_basico.agregar_arista(v1, v3)
 
-print(grafo_basico)
+# print(grafo_basico)
 
-# Test de funcion reemplaza
-print(Vertice("ab").reemplaza("a", "b"))
+# # Test de funcion reemplaza
+# print(Vertice("ab").reemplaza("a", "b"))
+
+# Ejemplo para comprobar que el grafo de reemplazo es correcto
+# grafo = generar_G_r(2, ["a", "b"])
+# print(grafo.vecinos)
 
 # Ejemplo Básico:
-# grafo = generar_G_r(4, ["o", "n", "c", "e"])
-# print(grafo.vecinos)
-# print(distancia_a_palindromo(grafo, "once"))  # Deberia devolver 2.
+grafo = generar_G_r(4, ["o", "n", "c", "e"])
+print(grafo.vecinos)
+print(distancia_a_palindromo(grafo, "once"))  # Deberia devolver 2.
