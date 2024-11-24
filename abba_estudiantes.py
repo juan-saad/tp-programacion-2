@@ -1,6 +1,6 @@
-from itertools import permutations, product
+from itertools import product
 from collections import deque
-from typing import Any, Dict, List, Set
+from typing import Dict, List, Set
 
 
 class Vertice:
