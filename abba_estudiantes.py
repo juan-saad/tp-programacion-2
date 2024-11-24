@@ -2,6 +2,7 @@ from itertools import permutations, product
 from collections import deque
 from typing import Any, Dict, List, Set
 
+
 class Vertice:
     def __init__(self, nombre: str) -> None:
         self.nombre = nombre
@@ -11,7 +12,7 @@ class Vertice:
 
     def __str__(self) -> str:
         return self.nombre
-    
+
     def __repr__(self) -> str:
         return f"{self.nombre
     }"
@@ -100,7 +101,27 @@ def generar_G_r(n: int, alfabeto: list[str]) -> GrafoDirigido | None:
 def distancia_a_palindromo(grafo: GrafoDirigido, start: str) -> int:
     """utiliza un algoritmo BFS para encontrar la minima distancia desde start
     a un palindromo en el grafo de reemplazos"""
-    pass
+    visitados = []
+    cola = deque([start])
+    distancia = 0
+
+    if es_palindromo(start):
+        return distancia
+
+    while len(cola) != 0:
+        vertice = cola.remove()
+
+        if vertice not in visitados:
+            visitados.append(vertice)
+
+            for vecino in grafo.get_adjacent(vertice):
+                if vecino not in visitados:
+                    cola.append(vecino)
+
+                if es_palindromo(vecino):
+                    distancia += 1
+
+    return distancia
 
 
 # Ejemplo basico de uso
