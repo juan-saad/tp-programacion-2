@@ -5,17 +5,19 @@ from typing import Any, Dict, List, Set
 
 class Vertice:
     def __init__(self, nombre: str) -> None:
-        self.nombre = nombre
+        self.nombre = str(nombre)
 
     def get_nombre(self) -> str:
         return self.nombre
+
+    def reemplaza(self, old: str, new: str) -> "Vertice":
+        return Vertice(self.nombre.replace(old, new))
 
     def __str__(self) -> str:
         return self.nombre
 
     def __repr__(self) -> str:
-        return f"{self.nombre
-    }"
+        return f"{self.nombre}"
 
 
 class GrafoDirigido:
@@ -138,6 +140,9 @@ grafo_basico.agregar_arista(v1, v2)
 grafo_basico.agregar_arista(v1, v3)
 
 print(grafo_basico)
+
+# Test de funcion reemplaza
+print(Vertice("ab").reemplaza("a", "b"))
 
 # Ejemplo Básico:
 # grafo = generar_G_r(4, ["o", "n", "c", "e"])
