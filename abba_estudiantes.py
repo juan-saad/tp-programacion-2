@@ -1,47 +1,19 @@
 from itertools import product
 from collections import deque
-from typing import Dict, List, Set
-
-
-class Vertice:
-    def __init__(self, nombre: str) -> None:
-        self.nombre = str(nombre)
-
-    def get_nombre(self) -> str:
-        return self.nombre
-
-    def reemplaza(self, old: str, new: str) -> "Vertice | None":
-        if old not in self.nombre:
-            return None
-        return Vertice(self.nombre.replace(old, new))
-
-    def __str__(self) -> str:
-        return self.nombre
-
-    def __repr__(self) -> str:
-        return f"{self.nombre}"
-
-    def __eq__(self, other):
-        if isinstance(other, Vertice):
-            return self.nombre == other.nombre
-
-        return False
-
-    def __hash__(self):
-        return hash(self.nombre)
 
 
 class GrafoDirigido:
     def __init__(self) -> None:
-        self.vertices: List[Vertice] = []
-        self.vecinos: Dict[Vertice, Set[Vertice]] = {}
+        self.vertices: list[str] = []
+        self.vecinos: dict[str, set[str]] = {}
 
-    def agregar_vertice(self, vertice: "Vertice") -> None:
+    def agregar_vertice(self, vertice) -> None:
         if vertice not in self.vecinos:
             self.vertices.append(vertice)
             self.vecinos[vertice] = set()
 
-    def agregar_arista(self, origen: "Vertice", destino: "Vertice") -> None:
+    def agregar_arista(self, origen, destino) -> None:
+        # Si origen y destino no estan en la lista de vecinos los agrego como nodoss
         if origen not in self.vecinos:
             self.agregar_vertice(origen)
 
@@ -50,10 +22,10 @@ class GrafoDirigido:
 
         self.vecinos[origen].add(destino)
 
-    def get_adjacent(self, vertice: "Vertice") -> Set[Vertice]:
+    def get_vecinos(self, vertice) -> set[str]:
         return self.vecinos[vertice]
 
-    def get_nodes(self) -> list["Vertice"]:
+    def get_vertices(self) -> list[str]:
         return self.vertices
 
     def __eq__(self, other: "GrafoDirigido") -> bool:
@@ -75,9 +47,7 @@ class GrafoDirigido:
         grafo_str = "{"
         for vertice, vecinos in self.vecinos.items():
             grafo_str += (
-                f" {vertice.get_nombre()}: {{"
-                + ", ".join([str(v.get_nombre()) for v in vecinos])
-                + "}},"
+                f" {vertice}: {{" + ", ".join([str(v) for v in vecinos]) + "}},"
             )
         grafo_str = grafo_str.rstrip(",") + " }"
         return grafo_str
@@ -113,19 +83,18 @@ def generar_G_r(n: int, alfabeto: list[str]) -> GrafoDirigido | None:
 
     grafo = GrafoDirigido()
 
-    # Hago el producto de todos los elementos del alfabeto para generar todos los posibles vertices
+    # Producto cartesiano de todas las posibles combinaciones del alfabeto n veces
     producto = product(alfabeto, repeat=n)
     vertices = ["".join(combinacion) for combinacion in producto]
 
     for vertice in vertices:
-        v = Vertice(vertice)
-        grafo.agregar_vertice(v)
+        grafo.agregar_vertice(vertice)
 
-    for vertice in grafo.get_nodes():
+    for vertice in grafo.get_vertices():
         for old in alfabeto:
             for new in alfabeto:
-                reemplazo = vertice.reemplaza(old, new)
-                if old != new and reemplazo and reemplazo in grafo.get_nodes():
+                reemplazo = reemplaza(vertice, old, new)
+                if old != new and reemplazo and reemplazo in grafo.get_vertices():
                     grafo.agregar_arista(vertice, reemplazo)
 
     return grafo
@@ -134,29 +103,38 @@ def generar_G_r(n: int, alfabeto: list[str]) -> GrafoDirigido | None:
 def distancia_a_palindromo(grafo: GrafoDirigido, start: str) -> int:
     """utiliza un algoritmo BFS para encontrar la minima distancia desde start
     a un palindromo en el grafo de reemplazos"""
-    vertice_start = Vertice(start)
 
-    if es_palindromo(vertice_start.get_nombre()):
+    if es_palindromo(start):
         return 0
 
     visitados = []
-    cola = deque([(vertice_start, 0)])  # Vertice actual y la distancia
+
+    # Me guardo el nodo y la distancia inicial
+    cola = deque([(start, 0)])
 
     while len(cola) != 0:
         vertice, distancia = cola.popleft()
 
-        if es_palindromo(vertice.get_nombre()):
+        if es_palindromo(vertice):
             return distancia
 
         if vertice not in visitados:
             visitados.append(vertice)
 
-            for vecino in grafo.get_adjacent(vertice):
+            for vecino in grafo.get_vecinos(vertice):
                 if vecino not in visitados:
                     cola.append((vecino, distancia + 1))
 
-    # No se encontró ningun palíndromo
+    # Retorno -1 si no encuentro un palíndromo
     return -1
+
+
+def reemplaza(vertice: str, old: str, new: str) -> "str | None":
+    # Evito reemplazos innecesarios en caso que no haya reemplazos posibles
+    if old not in vertice:
+        return None
+
+    return vertice.replace(old, new)
 
 
 # Ejemplo basico de uso
