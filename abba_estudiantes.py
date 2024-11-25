@@ -139,9 +139,9 @@ def reemplaza(vertice: str, old: str, new: str) -> "str | None":
 
 # Ejemplo basico de uso
 # grafo_basico = GrafoDirigido()
-# v1 = Vertice(1)
-# v2 = Vertice(2)
-# v3 = Vertice(3)
+# v1 = "1"
+# v2 = "2"
+# v3 = "3"
 
 # grafo_basico.agregar_vertice(v1)
 # grafo_basico.agregar_vertice(v2)
@@ -153,7 +153,7 @@ def reemplaza(vertice: str, old: str, new: str) -> "str | None":
 # print(grafo_basico)
 
 # # Test de funcion reemplaza
-# print(Vertice("ab").reemplaza("a", "b"))
+# print(reemplaza("ab", "a", "b"))
 
 # Ejemplo para comprobar que el grafo de reemplazo es correcto
 # grafo = generar_G_r(2, ["a", "b"])
