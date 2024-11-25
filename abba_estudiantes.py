@@ -1,3 +1,11 @@
+"""
+    Trabajo practico Programacion 2: "Problema de aplicación: abba"
+    Autores:
+        - Juan Manuel Saad
+        - Alfredo Sanz
+"""
+
+
 from itertools import product
 from collections import deque
 
