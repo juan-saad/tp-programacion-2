@@ -5,23 +5,22 @@
         - Alfredo Sanz
 """
 
-
 from itertools import product
 from collections import deque
-
+from typing import List, Set, Dict
 
 class GrafoDirigido:
     def __init__(self) -> None:
-        self.vertices: list[str] = []
-        self.vecinos: dict[str, set[str]] = {}
+        self.vertices: List[str] = []
+        self.vecinos: Dict[str, Set[str]] = {}
 
-    def agregar_vertice(self, vertice) -> None:
+    def agregar_vertice(self, vertice: str) -> None:
         if vertice not in self.vecinos:
             self.vertices.append(vertice)
             self.vecinos[vertice] = set()
 
-    def agregar_arista(self, origen, destino) -> None:
-        # Si origen y destino no estan en la lista de vecinos los agrego como nodoss
+    def agregar_arista(self, origen: str, destino: str) -> None:
+        # Si origen y destino no están en la lista de vecinos, los agrego como nodos
         if origen not in self.vecinos:
             self.agregar_vertice(origen)
 
@@ -30,10 +29,10 @@ class GrafoDirigido:
 
         self.vecinos[origen].add(destino)
 
-    def get_vecinos(self, vertice) -> set[str]:
+    def get_vecinos(self, vertice: str) -> Set[str]:
         return self.vecinos[vertice]
 
-    def get_vertices(self) -> list[str]:
+    def get_vertices(self) -> List[str]:
         return self.vertices
 
     def __eq__(self, other: "GrafoDirigido") -> bool:
